@@ -1,6 +1,7 @@
 # SwipeableMenu
 プロップの値を変えるだけでスワイプできます
 
+```
 <SwipeableView isVisibleLeft={true}>
   
   <RightView>
@@ -12,3 +13,4 @@
   </LeftView>
   
 </SwipeableView>
+```
