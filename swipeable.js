@@ -13,8 +13,8 @@ import { StyleSheet, View, LayoutAnimation } from 'react-native';
 /********************************************************************/
 const Dimensions = require('Dimensions');
 const {width, height} = Dimensions.get('window');
-const strIsLeft = 'LeftView'
-const strIsRight = 'RightView'
+const STR_LEFT = 'LeftView'
+const STR_RIGHT = 'RightView'
 
 /********************************************************************/
 /*                          SwipeableView                           */
@@ -38,6 +38,7 @@ export class SwipeableView extends Component{
     changeTheOrderLeftToRight(props) {
         const arrayComponent = React.Children.toArray(props.children)
         let LeftToRight = new Array()
+        let errCheck = ''
 
         // 全ての子コンポーネントを探索する
         React.Children.forEach(this.props.children, (child) => {
@@ -45,13 +46,32 @@ export class SwipeableView extends Component{
             strType = strType.substring(9, strType.indexOf('(props)'))
 
             // Leftを最初にする
-            if(strIsLeft === strType) {
+            if(STR_LEFT === strType) {
                 LeftToRight.push(arrayComponent[0])
+                errCheck += '1'
             }
-            else if(strIsRight === strType){
+            else if(STR_RIGHT === strType){
                 LeftToRight.push(arrayComponent[1])
+                errCheck += '10'
+            }
+            else {
+                errCheck += '01'
             }
         })
+
+        // エラーがあるかチェックする
+        if(('110' !== errCheck) &&
+            ('101' !== errCheck)) {
+                if('1' === errCheck) {
+                    throw new Error('you have to add RightView in SwipeableView, Error code:' + errCheck)
+                }
+                else if ('0' === errCheck) {
+                    throw new Error('you have to add LeftView in SwipeableView. Error code:' + errCheck)
+                }
+
+                throw new Error('Something wrong with your configuration of SwipeableView. Error code:' + errCheck)
+            }
+
         return LeftToRight
     }
 
@@ -62,15 +82,15 @@ export class SwipeableView extends Component{
 
         // 比較して異なれば更新
         if(nextProps.rightPosition !== this.state.rightPosition) {
-            this.swipe(nextProps)
+            this.swipe(nextProps.isVisibleLeft)
         }
     }
 
     /**************左へ移動***************/
-    swipe(nextProps) {
+    swipe(isVisibleLeft) {
         this.startLayoutAnimation()
         this.setState({
-            rightPosition: nextProps.isVisibleLeft ? 0 : width,
+            rightPosition: isVisibleLeft ? 0 : width,
         })
     }
 
