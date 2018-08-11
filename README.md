@@ -1,2 +1,14 @@
 # SwipeableMenu
-A react container which provides a smooth swipe interaction with any react-native view
+プロップの値を変えるだけでスワイプできます
+
+<SwipeableView isVisibleLeft={true}>
+  
+  <RightView>
+    <Text>{"RIGHT VIEW"}</Text>
+  </RightView>
+  
+  <LeftView>
+    <Text>{"LEFT VIEW"}</Text>
+  </LeftView>
+  
+</SwipeableView>
