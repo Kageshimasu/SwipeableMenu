@@ -5,23 +5,22 @@ import { StyleSheet, View, LayoutAnimation } from 'react-native';
 //+------------------------------------------------------------------+
 //| Module Name: PannableMenu                                        |
 //| Module Purpose: make your animations cool                        |
-//| Function: manage set the leftcomp and set the func to get back   |
+//| Function: set components in the left and right view              |
 //+------------------------------------------------------------------+
 
 /********************************************************************/
 /*                          global values                           */
 /********************************************************************/
 const Dimensions = require('Dimensions');
-const {width, height} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const STR_LEFT = 'LeftView'
 const STR_RIGHT = 'RightView'
+const MAX_LEFT = width
+const MIN_LEFT = -width
 
 /********************************************************************/
 /*                          SwipeableView                           */
-/* props: isOpend                   -> true/false if it's opened    */
-/*        onCloseThisByGesture      -> function when being closed   */
-/*        leftComponent             -> component after u gestured   */
-/*        lockGesture               -> true/false if u wanna lock   */
+/* props: isVisibleLeft     -> true/false if the left is opened     */
 /********************************************************************/
 export class SwipeableView extends Component{
     constructor(props) {
@@ -30,7 +29,7 @@ export class SwipeableView extends Component{
         // 実際に表示するコンポーネント
         this.LeftToRight = this.changeTheOrderLeftToRight(this.props)
         this.state = {
-            rightPosition: this.props.isVisibleLeft ? 0 : width,
+            rightPosition: this.props.isVisibleLeft ? MIN_LEFT : MAX_LEFT,
         }
     }
 
@@ -76,12 +75,12 @@ export class SwipeableView extends Component{
     }
 
     /**********propsが変更された場合************/
-    UNSAFE_componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps, nextState) {
         // 子コンポーネントは必ず更新する
         this.LeftToRight = this.changeTheOrderLeftToRight(nextProps)
 
         // 比較して異なれば更新
-        if(nextProps.rightPosition !== this.state.rightPosition) {
+        if(nextProps.isVisibleLeft != this.props.isVisibleLeft) {
             this.swipe(nextProps.isVisibleLeft)
         }
     }
@@ -90,7 +89,7 @@ export class SwipeableView extends Component{
     swipe(isVisibleLeft) {
         this.startLayoutAnimation()
         this.setState({
-            rightPosition: isVisibleLeft ? 0 : width,
+            rightPosition: isVisibleLeft ? MIN_LEFT : MAX_LEFT,
         })
     }
 
@@ -113,9 +112,11 @@ export class SwipeableView extends Component{
     /************レンダー*************/
     render() {
         return (
-            <View style={[styles.Container, {right: this.state.rightPosition}]}>
-                {this.LeftToRight[0]}
-                {this.LeftToRight[1]}
+            <View style={this.props.style}>
+                <View style={[styles.Container, {right: this.state.rightPosition / 2}]}>
+                    {this.LeftToRight[0]}
+                    {this.LeftToRight[1]}
+                </View>
             </View>
         )
     }
@@ -125,7 +126,6 @@ const styles = StyleSheet.create({
     Container: {
         flexDirection: 'row',
         width: width * 2,
-        height: height,
         flex: 1,
     },
 })
@@ -140,7 +140,7 @@ export class LeftView extends Component {
 
     render() {
         return (
-            <View style={[this.props.style, {width: width, height: height}]}>
+            <View style={[this.props.style, {flex: 1}]}>
                 {this.props.children}
             </View>
         )
@@ -157,7 +157,7 @@ export class RightView extends Component {
 
     render() {
         return (
-            <View style={[this.props.style, {width: width, height: height}]}>
+            <View style={[this.props.style, {flex: 1}]}>
                 {this.props.children}
             </View>
         )
